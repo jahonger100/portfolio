@@ -253,3 +253,9 @@ li{
     flex-direction: column;
     row-gap: 27px;
 }
+
+.project__img01{
+    height: 278px;
+    width: 370px;
+    border-radius: 10px;
+}
