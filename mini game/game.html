@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Крестики-нолики</title>
+
+<style>
+  :root {
+    --bg: #f2f2f2;
+    --text: #000;
+    --cell: #fff;
+    --border: #333;
+    --win: #90ee90;
+  }
+
+  body.dark {
+    --bg: #121212;
+    --text: #f2f2f2;
+    --cell: #1e1e1e;
+    --border: #888;
+    --win: #2e7d32;
+  }
+
+  body.blue {
+    --bg: #e3f2fd;
+    --text: #0d47a1;
+    --cell: #ffffff;
+    --border: #1565c0;
+    --win: #64b5f6;
+  }
+
+  body.pink {
+    --bg: #fce4ec;
+    --text: #880e4f;
+    --cell: #ffffff;
+    --border: #c2185b;
+    --win: #f48fb1;
+  }
+
+  .game {
+  background: var(--cell);
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center; /* центр по горизонтали */
+  align-items: center;     /* центр по вертикали */
+  height: 100vh;           /* высота экрана */
+  text-align: center;
+  transition: 0.3s;
+}
+
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 420px;
+    margin: auto;
+  }
+
+  select {
+    padding: 6px;
+    font-size: 14px;
+  }
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 120px);
+  grid-template-rows: repeat(3, 120px);
+  gap: 10px;
+  margin: 20px auto;
+}
+
+.cell {
+  width: 120px;
+  height: 120px;
+  font-size: 64px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  transition: background 0.2s;
+}
+
+.cell:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.cell:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+  .win {
+    background: var(--win);
+  }
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+  <div class="top">
+    <h2>Крестики-нолики</h2>
+    <select id="themeSelect">
+      <option value="">Light</option>
+      <option value="dark">Dark</option>
+      <option value="blue">Blue</option>
+      <option value="pink">Pink</option>
+    </select>
+  </div>
+
+  <div class="board">
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+  </div>
+
+  <div id="status">Ход: X</div>
+  <button onclick="resetGame()">Заново</button>
+
+</div>
+
+</body>
+
+<script>
+  const cells = document.querySelectorAll('.cell');
+  const statusText = document.getElementById('status');
+  const themeSelect = document.getElementById('themeSelect');
+
+  let currentPlayer = 'X';
+  let gameActive = true;
+
+  const wins = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  // game
+  cells.forEach(cell => {
+    cell.addEventListener('click', () => {
+      if (!gameActive || cell.textContent) return;
+
+      cell.textContent = currentPlayer;
+
+      if (checkWin()) return;
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      statusText.textContent = `Ход: ${currentPlayer}`;
+    });
+  });
+
+  function checkWin() {
+    for (let w of wins) {
+      const [a,b,c] = w;
+      if (
+        cells[a].textContent &&
+        cells[a].textContent === cells[b].textContent &&
+        cells[a].textContent === cells[c].textContent
+      ) {
+        cells[a].classList.add('win');
+        cells[b].classList.add('win');
+        cells[c].classList.add('win');
+        statusText.textContent = `Победил ${currentPlayer}!`;
+        gameActive = false;
+        return true;
+      }
+    }
+
+    if ([...cells].every(c => c.textContent)) {
+      statusText.textContent = 'Ничья!';
+      gameActive = false;
+      return true;
+    }
+    return false;
+  }
+
+  function resetGame() {
+    cells.forEach(c => {
+      c.textContent = '';
+      c.classList.remove('win');
+    });
+    currentPlayer = 'X';
+    gameActive = true;
+    statusText.textContent = 'Ход: X';
+  }
+
+  // themes
+  themeSelect.addEventListener('change', () => {
+    document.body.className = themeSelect.value;
+    localStorage.setItem('theme', themeSelect.value);
+  });
+
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    document.body.className = savedTheme;
+    themeSelect.value = savedTheme;
+  }
+</script>
+
+</body>
+</html>
